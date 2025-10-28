@@ -291,177 +291,18 @@
 
 
 
-// import express, { json } from "express";
-// import { spawn, execSync } from "child_process";
-// import { v4 as uuidv4 } from "uuid";
-// import { fileURLToPath } from "url";
-// import { dirname, join } from "path";
-// import {
-//   existsSync,
-//   mkdirSync,
-//   createWriteStream,
-//   readdirSync,
-//   unlinkSync,
-// } from "fs";
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-
-// const app = express();
-// app.use(json());
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.static("public"));
-// app.set("view engine", "ejs");
-
-// const DOWNLOAD_DIR = join(__dirname, "downloads");
-// if (!existsSync(DOWNLOAD_DIR)) mkdirSync(DOWNLOAD_DIR);
-
-// const downloads = {}; // jobId -> { status, filename, thumbnail }
-
-// // ------------------- UI -------------------
-// app.get("/", (req, res) => {
-//   res.render("index");
-// });
-
-// // ------------------- POST /download -------------------
-// app.post("/download", (req, res) => {
-//   const { url } = req.body;
-//   if (!url || !/^https?:\/\//.test(url))
-//     return res.render("index", { error: "Enter a valid video URL" });
-
-//   const id = uuidv4();
-//   const tempOut = join(DOWNLOAD_DIR, `${id}.%(ext)s`);
-//   const finalOut = join(DOWNLOAD_DIR, `${id}_final.mp4`);
-//   downloads[id] = { status: "processing", filename: null, thumbnail: null };
-
-//   console.log(`⬇️ Starting download for ${url}`);
-
-//   // Step 1: Get thumbnail URL
-//   const thumbProc = spawn("yt-dlp", ["--get-thumbnail", url]);
-//   thumbProc.stdout.on("data", (data) => {
-//     downloads[id].thumbnail = data.toString().trim();
-//   });
-
-//   // Step 2: Start download
-//   const args = [
-//     "--format",
-//     "bestvideo+bestaudio/best",
-//     "--merge-output-format",
-//     "mkv",
-//     "--output",
-//     tempOut,
-//     "--no-playlist",
-//     url,
-//   ];
-
-//   const logPath = join(DOWNLOAD_DIR, `${id}.log`);
-//   const logStream = createWriteStream(logPath, { flags: "a" });
-//   const ytdlp = spawn("yt-dlp", args);
-
-//   ytdlp.stdout.on("data", (data) => {
-//     const msg = data.toString();
-//     logStream.write(msg);
-//     const match = msg.match(/(\d+\.\d)%/);
-//     if (match) {
-//       downloads[id].progress = match[1];
-//     }
-//   });
-
-//   ytdlp.stderr.pipe(logStream);
-
-//   ytdlp.on("close", (code) => {
-//     console.log(`✅ yt-dlp finished with code ${code}`);
-//     const file = readdirSync(DOWNLOAD_DIR).find(
-//       (f) =>
-//         f.startsWith(id) &&
-//         (f.endsWith(".mkv") || f.endsWith(".webm") || f.endsWith(".mp4"))
-//     );
-
-//     if (!file) {
-//       downloads[id].status = "failed";
-//       console.log("❌ No downloaded file found!");
-//       return;
-//     }
-
-//     const inputPath = join(DOWNLOAD_DIR, file);
-
-//     // Step 3: Re-encode to universal MP4
-//     console.log("🎞 Re-encoding to MP4 (H.264 + AAC)...");
-//     try {
-//       execSync(
-//         `ffmpeg -y -i "${inputPath}" -c:v libx264 -preset medium -crf 18 -c:a aac -b:a 192k -movflags +faststart "${finalOut}"`,
-//         { stdio: "inherit" }
-//       );
-//       downloads[id].status = "ready";
-//       downloads[id].filename = `${id}_final.mp4`;
-//       console.log(`✅ Final video ready: ${finalOut}`);
-
-//       // Delete temporary file
-//       try {
-//         unlinkSync(inputPath);
-//       } catch {}
-
-//       // Auto delete after 10 mins
-//       setTimeout(() => {
-//         try {
-//           unlinkSync(finalOut);
-//           delete downloads[id];
-//           console.log(`🧹 Deleted ${finalOut}`);
-//         } catch {}
-//       }, 1000 * 60 * 10);
-//     } catch (err) {
-//       console.error("❌ Re-encode failed:", err);
-//       downloads[id].status = "failed";
-//     }
-//   });
-
-//   res.redirect(`/progress/${id}`);
-// });
-
-// // ------------------- Progress Page -------------------
-// app.get("/progress/:id", (req, res) => {
-//   const id = req.params.id;
-//   const data = downloads[id];
-//   if (!data) return res.status(404).send("Invalid job ID");
-//   res.render("progress", { id, data });
-// });
-
-// // ------------------- Polling for Progress -------------------
-// app.get("/status/:id", (req, res) => {
-//   const id = req.params.id;
-//   const data = downloads[id];
-//   if (!data) return res.json({ status: "not_found" });
-//   res.json(data);
-// });
-
-// // ------------------- Serve file -------------------
-// app.get("/file/:id", (req, res) => {
-//   const id = req.params.id;
-//   const data = downloads[id];
-//   if (!data?.filename) return res.status(404).send("Not ready yet");
-
-//   const filePath = join(DOWNLOAD_DIR, data.filename);
-//   res.download(filePath, "video.mp4");
-// });
-
-// // ------------------- Start Server -------------------
-// app.listen(3000, () =>
-//   console.log("🚀 Full HD Downloader at http://localhost:3000")
-// );
-
-
-
-
 import express, { json } from "express";
+import { spawn, execSync } from "child_process";
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import ytdlp from "yt-dlp-exec";
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegPath from "ffmpeg-static";
-import fs from "fs";
-
-ffmpeg.setFfmpegPath(ffmpegPath);
+import {
+  existsSync,
+  mkdirSync,
+  createWriteStream,
+  readdirSync,
+  unlinkSync,
+} from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -472,85 +313,120 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 
-const TMP_DIR = join(__dirname, "temp");
-if (!fs.existsSync(TMP_DIR)) fs.mkdirSync(TMP_DIR);
+const DOWNLOAD_DIR = join(__dirname, "downloads");
+if (!existsSync(DOWNLOAD_DIR)) mkdirSync(DOWNLOAD_DIR);
 
-const downloads = {}; // id -> { status, filename, progress, thumbnail }
+const downloads = {}; // jobId -> { status, filename, thumbnail }
 
-// ---------------- UI ----------------
+// ------------------- UI -------------------
 app.get("/", (req, res) => {
   res.render("index");
 });
 
-// ---------------- START DOWNLOAD ----------------
-app.post("/download", async (req, res) => {
+// ------------------- POST /download -------------------
+app.post("/download", (req, res) => {
   const { url } = req.body;
   if (!url || !/^https?:\/\//.test(url))
     return res.render("index", { error: "Enter a valid video URL" });
 
   const id = uuidv4();
-  const tempFile = join(TMP_DIR, `${id}.%(ext)s`);
-  const finalOut = join(TMP_DIR, `${id}.mp4`);
+  const tempOut = join(DOWNLOAD_DIR, `${id}.%(ext)s`);
+  const finalOut = join(DOWNLOAD_DIR, `${id}_final.mp4`);
+  downloads[id] = { status: "processing", filename: null, thumbnail: null };
 
-  downloads[id] = { status: "processing", progress: 0, thumbnail: null };
+  console.log(`⬇️ Starting download for ${url}`);
 
-  console.log(`⬇️ Download started for: ${url}`);
+  // Step 1: Get thumbnail URL
+  const thumbProc = spawn("yt-dlp", ["--get-thumbnail", url]);
+  thumbProc.stdout.on("data", (data) => {
+    downloads[id].thumbnail = data.toString().trim();
+  });
 
-  try {
-    // 1️⃣ Get thumbnail URL
-    const thumbUrl = await ytdlp(url, { getThumbnail: true });
-    downloads[id].thumbnail = thumbUrl.trim();
+  // Step 2: Start download
+  const args = [
+    "--format",
+    "bestvideo+bestaudio/best",
+    "--merge-output-format",
+    "mkv",
+    "--output",
+    tempOut,
+    "--no-playlist",
+    url,
+  ];
 
-    // 2️⃣ Download best video/audio
-    await ytdlp(url, {
-      output: tempFile,
-      format: "bestvideo+bestaudio/best",
-      mergeOutputFormat: "mkv",
-      noPlaylist: true,
-      progress: true,
-    });
+  const logPath = join(DOWNLOAD_DIR, `${id}.log`);
+  const logStream = createWriteStream(logPath, { flags: "a" });
+  const ytdlp = spawn("yt-dlp", args);
 
-    // find actual file
-    const file = fs
-      .readdirSync(TMP_DIR)
-      .find((f) => f.startsWith(id) && (f.endsWith(".mkv") || f.endsWith(".webm")));
+  ytdlp.stdout.on("data", (data) => {
+    const msg = data.toString();
+    logStream.write(msg);
+    const match = msg.match(/(\d+\.\d)%/);
+    if (match) {
+      downloads[id].progress = match[1];
+    }
+  });
 
-    if (!file) throw new Error("Download failed");
+  ytdlp.stderr.pipe(logStream);
 
-    const inputPath = join(TMP_DIR, file);
+  ytdlp.on("close", (code) => {
+    console.log(`✅ yt-dlp finished with code ${code}`);
+    const file = readdirSync(DOWNLOAD_DIR).find(
+      (f) =>
+        f.startsWith(id) &&
+        (f.endsWith(".mkv") || f.endsWith(".webm") || f.endsWith(".mp4"))
+    );
 
+    if (!file) {
+      downloads[id].status = "failed";
+      console.log("❌ No downloaded file found!");
+      return;
+    }
+
+    const inputPath = join(DOWNLOAD_DIR, file);
+
+    // Step 3: Re-encode to universal MP4
     console.log("🎞 Re-encoding to MP4 (H.264 + AAC)...");
-    await new Promise((resolve, reject) => {
-      ffmpeg(inputPath)
-        .outputOptions(["-c:v libx264", "-preset fast", "-crf 22", "-c:a aac", "-movflags +faststart"])
-        .save(finalOut)
-        .on("end", resolve)
-        .on("error", reject);
-    });
+    try {
+      execSync(
+        `ffmpeg -y -i "${inputPath}" -c:v libx264 -preset medium -crf 18 -c:a aac -b:a 192k -movflags +faststart "${finalOut}"`,
+        { stdio: "inherit" }
+      );
+      downloads[id].status = "ready";
+      downloads[id].filename = `${id}_final.mp4`;
+      console.log(`✅ Final video ready: ${finalOut}`);
 
-    downloads[id].status = "ready";
-    downloads[id].filename = `${id}.mp4`;
+      // Delete temporary file
+      try {
+        unlinkSync(inputPath);
+      } catch {}
 
-    // cleanup
-    fs.unlinkSync(inputPath);
-    console.log(`✅ Final video ready: ${finalOut}`);
-  } catch (err) {
-    console.error("❌ Error:", err);
-    downloads[id].status = "failed";
-  }
+      // Auto delete after 10 mins
+      setTimeout(() => {
+        try {
+          unlinkSync(finalOut);
+          delete downloads[id];
+          console.log(`🧹 Deleted ${finalOut}`);
+        } catch {}
+      }, 1000 * 60 * 10);
+    } catch (err) {
+      console.error("❌ Re-encode failed:", err);
+      downloads[id].status = "failed";
+    }
+  });
 
   res.redirect(`/progress/${id}`);
 });
 
-// ---------------- Progress Page ----------------
+// ------------------- Progress Page -------------------
 app.get("/progress/:id", (req, res) => {
   const id = req.params.id;
   const data = downloads[id];
-  if (!data) return res.status(404).send("Invalid ID");
+  if (!data) return res.status(404).send("Invalid job ID");
   res.render("progress", { id, data });
 });
 
-// ---------------- Check Status ----------------
+// ------------------- Polling for Progress -------------------
 app.get("/status/:id", (req, res) => {
   const id = req.params.id;
   const data = downloads[id];
@@ -558,22 +434,17 @@ app.get("/status/:id", (req, res) => {
   res.json(data);
 });
 
-// ---------------- Serve File ----------------
+// ------------------- Serve file -------------------
 app.get("/file/:id", (req, res) => {
   const id = req.params.id;
   const data = downloads[id];
-  if (!data || data.status !== "ready") return res.status(404).send("Not ready yet");
+  if (!data?.filename) return res.status(404).send("Not ready yet");
 
-  const filePath = join(TMP_DIR, data.filename);
-  res.setHeader("Content-Disposition", `attachment; filename="video.mp4"`);
-  res.sendFile(filePath, {}, (err) => {
-    if (!err) {
-      // auto delete after sending
-      fs.unlink(filePath, () => {});
-      delete downloads[id];
-    }
-  });
+  const filePath = join(DOWNLOAD_DIR, data.filename);
+  res.download(filePath, "video.mp4");
 });
 
-// ---------------- Start Server ----------------
-app.listen(3000, () => console.log("🚀 HD Downloader running at http://localhost:3000"));
+// ------------------- Start Server -------------------
+app.listen(3000, () =>
+  console.log("🚀 Full HD Downloader at http://localhost:3000")
+);
