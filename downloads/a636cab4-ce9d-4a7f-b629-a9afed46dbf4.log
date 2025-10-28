@@ -1,0 +1,24 @@
+[youtube] Extracting URL: https://youtube.com/shorts/aDGWh3SEUlo?si=j7c2RvzV65a5fINA
+[youtube] aDGWh3SEUlo: Downloading webpage
+[youtube] aDGWh3SEUlo: Downloading android sdkless player API JSON
+[youtube] aDGWh3SEUlo: Downloading tv client config
+[youtube] aDGWh3SEUlo: Downloading tv player API JSON
+[youtube] aDGWh3SEUlo: Downloading web safari player API JSON
+[youtube] aDGWh3SEUlo: Downloading player 5cf6312f-main
+WARNING: [youtube] Falling back to generic n function search
+         player = https://www.youtube.com/s/player/5cf6312f/player_ias.vflset/en_US/base.js
+WARNING: [youtube] aDGWh3SEUlo: nsig extraction failed: Some formats may be missing
+         n = bseU9C0n6InC5k0 ; player = https://www.youtube.com/s/player/5cf6312f/player_ias.vflset/en_US/base.js
+         Please report this issue on  https://github.com/yt-dlp/yt-dlp/issues?q= , filling out the appropriate issue template. Confirm you are on the latest version using  yt-dlp -U
+WARNING: [youtube] aDGWh3SEUlo: Some web_safari client https formats have been skipped as they are missing a url. YouTube is forcing SABR streaming for this client. See  https://github.com/yt-dlp/yt-dlp/issues/12482  for more details
+WARNING: [youtube] aDGWh3SEUlo: Some web client https formats have been skipped as they are missing a url. YouTube is forcing SABR streaming for this client. See  https://github.com/yt-dlp/yt-dlp/issues/12482  for more details
+[youtube] aDGWh3SEUlo: Downloading m3u8 information
+[info] aDGWh3SEUlo: Downloading 1 format(s): 399+251
+[download] Sleeping 4.00 seconds as required by the site...
+[download] Destination: /Users/vishu_pc/Desktop/project/YouTubeTopicVedioProject/VedioDownloader/downloads/a636cab4-ce9d-4a7f-b629-a9afed46dbf4.f399.mp4
+[download]   0.0% of    5.97MiB at  619.54KiB/s ETA 00:10[download]   0.0% of    5.97MiB at    1.13MiB/s ETA 00:05[download]   0.1% of    5.97MiB at    2.27MiB/s ETA 00:02[download]   0.2% of    5.97MiB at    4.35MiB/s ETA 00:01[download]   0.5% of    5.97MiB at    2.17MiB/s ETA 00:02[download]   1.0% of    5.97MiB at    2.43MiB/s ETA 00:02[download]   2.1% of    5.97MiB at    3.49MiB/s ETA 00:01[download]   4.2% of    5.97MiB at    5.00MiB/s ETA 00:01[download]   8.4% of    5.97MiB at    7.58MiB/s ETA 00:00[download]  16.7% of    5.97MiB at    3.00MiB/s ETA 00:01[download]  33.5% of    5.97MiB at    4.41MiB/s ETA 00:00[download]  67.0% of    5.97MiB at    4.00MiB/s ETA 00:00[download] 100.0% of    5.97MiB at    3.89MiB/s ETA 00:00[download] 100% of    5.97MiB in 00:00:01 at 3.61MiB/s   
+[download] Destination: /Users/vishu_pc/Desktop/project/YouTubeTopicVedioProject/VedioDownloader/downloads/a636cab4-ce9d-4a7f-b629-a9afed46dbf4.f251.webm
+[download]   0.2% of  462.53KiB at  958.92KiB/s ETA 00:00[download]   0.6% of  462.53KiB at    1.54MiB/s ETA 00:00[download]   1.5% of  462.53KiB at    2.96MiB/s ETA 00:00[download]   3.2% of  462.53KiB at    5.46MiB/s ETA 00:00[download]   6.7% of  462.53KiB at    9.76MiB/s ETA 00:00[download]  13.6% of  462.53KiB at   17.34MiB/s ETA 00:00[download]  27.5% of  462.53KiB at    4.90MiB/s ETA 00:00[download]  55.1% of  462.53KiB at    7.69MiB/s ETA 00:00[download] 100.0% of  462.53KiB at   11.53MiB/s ETA 00:00[download] 100% of  462.53KiB in 00:00:00 at 1.11MiB/s   
+[Merger] Merging formats into "/Users/vishu_pc/Desktop/project/YouTubeTopicVedioProject/VedioDownloader/downloads/a636cab4-ce9d-4a7f-b629-a9afed46dbf4.mkv"
+Deleting original file /Users/vishu_pc/Desktop/project/YouTubeTopicVedioProject/VedioDownloader/downloads/a636cab4-ce9d-4a7f-b629-a9afed46dbf4.f251.webm (pass -k to keep)
+Deleting original file /Users/vishu_pc/Desktop/project/YouTubeTopicVedioProject/VedioDownloader/downloads/a636cab4-ce9d-4a7f-b629-a9afed46dbf4.f399.mp4 (pass -k to keep)
