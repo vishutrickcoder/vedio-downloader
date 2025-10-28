@@ -1,0 +1,116 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HD Video Downloader</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🎥 HD Video Downloader</h1>
+
+    <input id="urlInput" type="text" placeholder="Enter Video URL..." />
+    <button id="downloadBtn">Start Download</button>
+
+    <div id="preview" class="hidden">
+      <img id="thumb" src="" alt="Thumbnail" />
+    </div>
+
+    <div id="progressContainer" class="hidden">
+      <p>⏳ Downloading...</p>
+      <div class="progress-bar">
+        <div id="progress" class="progress"></div>
+      </div>
+      <p id="percent">0%</p>
+    </div>
+
+    <div id="result" class="hidden">
+      <p>✅ Your video is ready!</p>
+      <a id="downloadLink" href="#" target="_blank">Download File</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("downloadBtn").addEventListener("click", async () => {
+      const url = document.getElementById("urlInput").value.trim();
+      if (!url) return alert("Enter a valid URL");
+
+      document.getElementById("progressContainer").classList.remove("hidden");
+      document.getElementById("result").classList.add("hidden");
+
+      const res = await fetch("/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      const jobId = data.jobId;
+
+      const poll = setInterval(async () => {
+        const statusRes = await fetch(`/status/${jobId}`);
+        const s = await statusRes.json();
+
+        if (s.thumbnail && !document.getElementById("thumb").src) {
+          document.getElementById("preview").classList.remove("hidden");
+          document.getElementById("thumb").src = s.thumbnail;
+        }
+
+        document.getElementById("progress").style.width = `${s.progress}%`;
+        document.getElementById("percent").innerText = `${s.progress.toFixed(1)}%`;
+
+        if (s.status === "ready") {
+          clearInterval(poll);
+          document.getElementById("result").classList.remove("hidden");
+          document.getElementById("downloadLink").href = s.downloadUrl;
+        }
+
+        if (s.status === "failed") {
+          clearInterval(poll);
+          alert("❌ Failed to process video");
+        }
+      }, 3000);
+    });
+  </script>
+</body>
+</html> 
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HD Video Downloader</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="main-container fade-in">
+      <h1 class="heading">🎬 HD Video Downloader</h1>
+      <p class="subtext">Download videos in high quality directly to your device</p>
+
+      <form action="/download" method="POST" class="download-form">
+        <input
+          type="text"
+          name="url"
+          placeholder="Paste YouTube / Instagram link..."
+          required
+          class="url-input"
+        />
+        <div class="quality-row">
+          <label>Quality:</label>
+          <select name="quality" class="quality-select">
+            <option value="1080">1080p</option>
+            <option value="720">720p</option>
+            <option value="480">480p</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">Start Download 🚀</button>
+      </form>
+
+      <% if (typeof error !== "undefined") { %>
+      <p class="error"><%= error %></p>
+      <% } %>
+    </div>
+  </body>
+</html>

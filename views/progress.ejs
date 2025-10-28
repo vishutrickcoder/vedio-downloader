@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download Progress</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script>
+      async function checkStatus() {
+        const res = await fetch("/status/<%= id %>");
+        const data = await res.json();
+        const bar = document.getElementById("bar");
+        const percent = document.getElementById("percent");
+        const thumb = document.getElementById("thumb");
+        const link = document.getElementById("downloadLink");
+
+        if (data.thumbnail && !thumb.src) thumb.src = data.thumbnail;
+
+        if (data.status === "processing") {
+          percent.textContent = data.progress
+            ? `${data.progress}% Completed`
+            : "Downloading...";
+          bar.style.width = (data.progress || 0) + "%";
+        } else if (data.status === "ready") {
+          percent.textContent = "✅ Download Ready!";
+          bar.style.width = "100%";
+          link.style.display = "inline-block";
+        } else if (data.status === "failed") {
+          percent.textContent = "❌ Download Failed!";
+        }
+      }
+      setInterval(checkStatus, 3000);
+    </script>
+  </head>
+  <body>
+    <div class="main-container fade-in">
+      <h2 class="heading-sm">Your Video is Downloading...</h2>
+      <img id="thumb" src="" alt="Thumbnail" class="thumb pulse" />
+      <div class="progress-container">
+        <div id="bar" class="bar"></div>
+      </div>
+      <p id="percent" class="progress-text">Starting...</p>
+      <a
+        id="downloadLink"
+        href="/file/<%= id %>"
+        class="btn-success"
+        style="display: none"
+        >⬇️ Download to Your System</a
+      >
+    </div>
+  </body>
+</html>
